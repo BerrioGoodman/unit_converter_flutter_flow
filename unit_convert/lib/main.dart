@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unit_convert/screens/weight_converter_screen.dart';
 import 'screens/length_converter_screen.dart';
 
 void main() {
@@ -14,7 +15,7 @@ class UnitConverterApp extends StatelessWidget
     (
         title: 'Unit Converter',
         theme: ThemeData(primarySwatch: Colors.blue),
-        home: LengthConverterScreen(),
+        home: WeightConverterScreen(),
     );
   }
 }
