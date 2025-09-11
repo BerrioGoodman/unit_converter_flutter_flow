@@ -9,4 +9,41 @@ class ConversionService {
     double baseValue = value / rates[fromUnit]!;
     return baseValue * rates[toUnit]!;
   }
+
+  //temp conversion
+  static double? convertTemperature(double value, String fromUnit, String toUnit) 
+  {
+   
+   if(fromUnit == toUnit) return value; // No se necesita una conversión
+    double celsiusValue;
+
+    // Convertir a Celsius primero
+    switch(fromUnit) 
+    {
+      case 'Celsius':
+        celsiusValue = value;
+        break;
+      case 'Fahrenheit':
+        celsiusValue = (value - 32) * 5/9;
+        break;
+      case 'Kelvin':
+        celsiusValue = value - 273.15;
+        break;
+      default:
+        return null; // Unidad no válida
+    }
+
+    // Luego convertir de Celsius a la unidad deseada
+    switch(toUnit) 
+    {
+      case 'Celsius':
+        return celsiusValue;
+      case 'Fahrenheit':
+        return (celsiusValue * 9/5) + 32;
+      case 'Kelvin':
+        return celsiusValue + 273.15;
+      default:
+        return null; // Unidad no válida
+    }
+  }
 }
