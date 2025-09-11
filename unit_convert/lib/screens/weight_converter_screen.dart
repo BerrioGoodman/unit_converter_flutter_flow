@@ -1,42 +1,48 @@
 import 'package:flutter/material.dart';
-import '../../services/conversion_service.dart';
-import '../models/conversion_rates.dart';
+import '../models/weight_units.dart';
+import '../services/conversion_service.dart';
 
-class LengthConverterScreen extends StatefulWidget
-{
+class WeightConverterScreen extends StatefulWidget {
   @override
-  _LengthConverterScreenState createState() => _LengthConverterScreenState();
+  _WeightConverterScreenState createState() => _WeightConverterScreenState();
 }
 
-class _LengthConverterScreenState extends State<LengthConverterScreen>
-{
+class _WeightConverterScreenState extends State<WeightConverterScreen> {
   final TextEditingController _controller = TextEditingController();
-  String _fromUnit = 'Kilómetros';
-  String _toUnit = "Metros";
+  String _fromUnit = 'Kilogramos';
+  String _toUnit = 'Libras';
   double? _result;
+  String? _error;
 
   void _convert() {
     double? input = double.tryParse(_controller.text);
-    if (input != null) {
-      setState(() {
-        _result = ConversionService.convert(
-          input,
-          _fromUnit,
-          _toUnit,
-          conversionRates
-        );
-      });
-    } else {
+
+    if (input == null) {
       setState(() {
         _result = null;
+        _error = "Ingrese un número válido";
       });
+      return;
     }
+
+    double? converted = ConversionService.convert(
+        input, _fromUnit, _toUnit, WeightUnits.conversionRates);
+
+    setState(() {
+      if (converted == null) {
+        _result = null;
+        _error = "El valor no puede ser negativo";
+      } else {
+        _result = converted;
+        _error = null;
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Conversor de Longitud')),
+      appBar: AppBar(title: Text("Conversor de Peso")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -56,44 +62,46 @@ class _LengthConverterScreenState extends State<LengthConverterScreen>
               children: [
                 DropdownButton<String>(
                   value: _fromUnit,
-                  items: conversionRates.keys
+                  items: WeightUnits.conversionRates.keys
                       .map((unit) => DropdownMenuItem(
                             value: unit,
                             child: Text(unit),
                           ))
                       .toList(),
                   onChanged: (value) {
-                    setState(() {
-                      _fromUnit = value!;
-                    });
+                    setState(() => _fromUnit = value!);
                     _convert();
                   },
                 ),
-                Icon(Icons.arrow_forward),
+                Icon(Icons.swap_horiz),
                 DropdownButton<String>(
                   value: _toUnit,
-                  items: conversionRates.keys
+                  items: WeightUnits.conversionRates.keys
                       .map((unit) => DropdownMenuItem(
                             value: unit,
                             child: Text(unit),
                           ))
                       .toList(),
                   onChanged: (value) {
-                    setState(() {
-                      _toUnit = value!;
-                    });
+                    setState(() => _toUnit = value!);
                     _convert();
                   },
                 ),
               ],
             ),
             SizedBox(height: 32),
-            Text(
-              _result == null
-                  ? 'Ingrese un número válido'
-                  : 'Resultado: ${_result!.toStringAsFixed(2)} $_toUnit',
-              style: TextStyle(fontSize: 20),
-            ),
+            if (_error != null)
+              Text(
+                _error!,
+                style: TextStyle(color: Colors.red, fontSize: 16),
+              )
+            else if (_result != null)
+              Text(
+                'Resultado: ${_result!.toStringAsFixed(2)} $_toUnit',
+                style: TextStyle(fontSize: 20),
+              )
+            else
+              Text('Ingrese un valor para convertir'),
           ],
         ),
       ),
