@@ -22,7 +22,9 @@ models → estructuras de datos.
 services → lógica de negocio y persistencia.
 
 screens → pantallas principales de la app.
+
 ---
+
 # 📂 Estructura del Proyecto
 
 lib/
@@ -58,7 +60,9 @@ lib/
 ├── temperature\_converter\_screen.dart    # Conversor de temperatura
 
 └── history\_screen.dart                   # Historial de conversiones
+
 ---
+
 # 🛠️ Modelos
 
 ## ConversionHistory
@@ -104,7 +108,9 @@ Celsius 🌡️
 Fahrenheit 🔥
 
 Kelvin ❄️
+
 ---
+
 # ⚙️ Servicios
 
 ## ConversionService
@@ -120,7 +126,9 @@ saveConversion(conversion) → guarda una conversión en historial.
 getConversionHistory() → retorna lista de conversiones almacenadas.
 
 clearHistory() → elimina todo el historial.
+
 ---
+
 # 🖼️ Pantallas
 
 ## 🔹 HomeScreen
@@ -152,7 +160,9 @@ Ver lista de conversiones recientes.
 Refrescar historial.
 
 Limpiar historial con confirmación.
+
 ---
+
 # 🚀 Instalación y Uso
 
 ### Clonar el repositorio:
