@@ -1,4 +1,3 @@
-import '../models/conversion_rates.dart';
 
 class ConversionService {
   static double? convert(double value, String fromUnit, String toUnit, Map<String, double> rates)

@@ -126,7 +126,7 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: _error != null ? Colors.red : pastelPrimary,
+                    color: _error != null ? Colors.black : pastelPrimary,
                   ),
                 ),
               ),

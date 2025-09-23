@@ -3,89 +3,149 @@ import '../models/temperature_units.dart';
 import '../services/conversion_service.dart';
 
 class TemperatureConverterScreen extends StatefulWidget {
-  const TemperatureConverterScreen({super.key});
-
   @override
-  State<TemperatureConverterScreen> createState() =>
-      _TemperatureConverterScreenState();
+  _TemperatureConverterScreenState createState() => _TemperatureConverterScreenState();
 }
 
-class _TemperatureConverterScreenState
-    extends State<TemperatureConverterScreen> {
+class _TemperatureConverterScreenState extends State<TemperatureConverterScreen> {
   final TextEditingController _controller = TextEditingController();
   String _fromUnit = 'Celsius';
   String _toUnit = 'Fahrenheit';
   double? _result;
 
+  // 🎨 Colores pastel
+  final Color pastelBackground = const Color(0xFFF8F1F1);
+  final Color pastelPrimary = const Color(0xFFA3C9A8);
+  final Color pastelAccent = const Color(0xFFFFDAB9);
+
+  // 📌 Íconos por unidad de temperatura
+  final Map<String, IconData> unitIcons = {
+    'Celsius': Icons.thermostat,
+    'Fahrenheit': Icons.local_fire_department,
+    'Kelvin': Icons.ac_unit,
+  };
+
   void _convert() {
-    setState(() {
-      final input = double.tryParse(_controller.text);
-      if (input != null) {
-        _result = ConversionService.convertTemperature(
-          input,
-          _fromUnit,
-          _toUnit,
-        );
-      } else {
+    double? input = double.tryParse(_controller.text);
+    if (input != null) {
+      setState(() {
+        _result = ConversionService.convertTemperature(input, _fromUnit, _toUnit);
+      });
+    } else {
+      setState(() {
         _result = null;
-      }
-    });
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Conversor de Temperatura')),
+      backgroundColor: pastelBackground,
+      appBar: AppBar(
+        title: const Text(
+          'Conversor de Temperatura',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        elevation: 2,
+        backgroundColor: pastelPrimary,
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Caja de texto
             TextField(
               controller: _controller,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Ingrese valor'),
+              style: const TextStyle(fontSize: 18),
+              decoration: InputDecoration(
+                labelText: 'Ingrese un valor',
+                labelStyle: TextStyle(color: pastelPrimary),
+                prefixIcon: Icon(Icons.thermostat, color: pastelPrimary),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              onChanged: (value) => _convert(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
+
+            // Dropdowns alineados
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                DropdownButton<String>(
-                  value: _fromUnit,
-                  items: TemperatureUnits.units
-                      .map((unit) =>
-                          DropdownMenuItem(value: unit, child: Text(unit)))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() => _fromUnit = value!);
-                  },
-                ),
-                const Icon(Icons.arrow_forward),
-                DropdownButton<String>(
-                  value: _toUnit,
-                  items: TemperatureUnits.units
-                      .map((unit) =>
-                          DropdownMenuItem(value: unit, child: Text(unit)))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() => _toUnit = value!);
-                  },
-                ),
+                _buildDropdown(_fromUnit, (value) {
+                  setState(() => _fromUnit = value!);
+                  _convert();
+                }),
+                Icon(Icons.swap_horiz, color: pastelAccent, size: 28),
+                _buildDropdown(_toUnit, (value) {
+                  setState(() => _toUnit = value!);
+                  _convert();
+                }),
               ],
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _convert,
-              child: const Text('Convertir'),
-            ),
-            const SizedBox(height: 20),
-            if (_result != null)
-              Text(
-                'Resultado: ${_result!.toStringAsFixed(2)} $_toUnit',
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            const SizedBox(height: 40),
+
+            // Resultado estilizado con fondo blanco y sombra
+            Card(
+              color: Colors.white,
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Text(
+                  _result == null
+                      ? 'Ingrese un número válido'
+                      : 'Resultado:\n${_result!.toStringAsFixed(2)} $_toUnit',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: pastelPrimary,
+                  ),
+                ),
               ),
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  // Método para dropdown con íconos
+  Widget _buildDropdown(String currentValue, ValueChanged<String?> onChanged) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: pastelPrimary, width: 1.5),
+      ),
+      child: DropdownButton<String>(
+        value: currentValue,
+        underline: const SizedBox(),
+        icon: Icon(Icons.arrow_drop_down, color: pastelPrimary),
+        items: TemperatureUnits.units.map((unit) {
+          return DropdownMenuItem(
+            value: unit,
+            child: Row(
+              children: [
+                Icon(unitIcons[unit] ?? Icons.help_outline,
+                    color: pastelPrimary, size: 20),
+                const SizedBox(width: 8),
+                Text(unit),
+              ],
+            ),
+          );
+        }).toList(),
+        onChanged: onChanged,
       ),
     );
   }
