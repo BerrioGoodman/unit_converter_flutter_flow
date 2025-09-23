@@ -3,8 +3,8 @@
 # 📱 Flutter Unit Converter
 
 Aplicación móvil desarrollada en Flutter que permite realizar conversiones entre distintas unidades de longitud, peso y temperatura.
-
 Además, la app guarda un historial persistente de conversiones utilizando SharedPreferences.
+
 ---
 
 # ✨ Características
