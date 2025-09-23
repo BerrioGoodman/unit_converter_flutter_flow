@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/temperature_units.dart';
 import '../services/conversion_service.dart';
+import '../models/conversion_history.dart';
+import '../services/preferences_service.dart';
 
 class TemperatureConverterScreen extends StatefulWidget {
   @override
@@ -28,9 +30,23 @@ class _TemperatureConverterScreenState extends State<TemperatureConverterScreen>
   void _convert() {
     double? input = double.tryParse(_controller.text);
     if (input != null) {
+      final result = ConversionService.convertTemperature(input, _fromUnit, _toUnit);
       setState(() {
-        _result = ConversionService.convertTemperature(input, _fromUnit, _toUnit);
+        _result = result;
       });
+
+      // Save to history if conversion was successful
+      if (result != null) {
+        final conversion = ConversionHistory(
+          type: 'temperature',
+          inputValue: input,
+          fromUnit: _fromUnit,
+          toUnit: _toUnit,
+          result: result,
+          timestamp: DateTime.now(),
+        );
+        PreferencesService.saveConversion(conversion);
+      }
     } else {
       setState(() {
         _result = null;

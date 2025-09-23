@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'length_converter_screen.dart';
 import 'weight_converter_screen.dart';
 import 'temperature_converter_screen.dart';
+import 'history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -15,6 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
     LengthConverterScreen(),
     WeightConverterScreen(),
     TemperatureConverterScreen(),
+    HistoryScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -41,8 +43,19 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.thermostat),
             label: 'Temperatura',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'Historial',
+          ),
         ],
         currentIndex: _selectedIndex,
+        selectedItemColor: const Color(0xFF2E7D32), // Dark green for selected
+        unselectedItemColor: const Color(0xFF6D6D6D), // Medium gray for unselected
+        backgroundColor: Colors.white,
+        elevation: 8,
+        type: BottomNavigationBarType.fixed,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
         onTap: _onItemTapped,
       ),
     );

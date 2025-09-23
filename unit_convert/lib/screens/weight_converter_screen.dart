@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/weight_units.dart';
 import '../services/conversion_service.dart';
+import '../models/conversion_history.dart';
+import '../services/preferences_service.dart';
 
 class WeightConverterScreen extends StatefulWidget {
   @override
@@ -50,6 +52,17 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
       } else {
         _result = converted;
         _error = null;
+
+        // Save to history
+        final conversion = ConversionHistory(
+          type: 'weight',
+          inputValue: input,
+          fromUnit: _fromUnit,
+          toUnit: _toUnit,
+          result: converted,
+          timestamp: DateTime.now(),
+        );
+        PreferencesService.saveConversion(conversion);
       }
     });
   }

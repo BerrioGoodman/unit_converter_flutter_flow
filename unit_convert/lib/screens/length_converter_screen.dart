@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../services/conversion_service.dart';
 import '../models/conversion_rates.dart';
+import '../models/conversion_history.dart';
+import '../services/preferences_service.dart';
 
 class LengthConverterScreen extends StatefulWidget {
   @override
@@ -33,10 +35,24 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
   void _convert() {
     double? input = double.tryParse(_controller.text);
     if (input != null) {
+      final result =
+          ConversionService.convert(input, _fromUnit, _toUnit, conversionRates);
       setState(() {
-        _result =
-            ConversionService.convert(input, _fromUnit, _toUnit, conversionRates);
+        _result = result;
       });
+
+      // Save to history if conversion was successful
+      if (result != null) {
+        final conversion = ConversionHistory(
+          type: 'length',
+          inputValue: input,
+          fromUnit: _fromUnit,
+          toUnit: _toUnit,
+          result: result,
+          timestamp: DateTime.now(),
+        );
+        PreferencesService.saveConversion(conversion);
+      }
     } else {
       setState(() {
         _result = null;
