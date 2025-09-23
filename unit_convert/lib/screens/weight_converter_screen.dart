@@ -14,6 +14,21 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
   double? _result;
   String? _error;
 
+  // 🎨 Colores pastel
+  final Color pastelBackground = const Color(0xFFF8F1F1); 
+  final Color pastelPrimary = const Color(0xFFA3C9A8); 
+  final Color pastelAccent = const Color(0xFFEDB5BD); 
+
+  // 📌 Íconos por unidad de peso
+  final Map<String, IconData> unitIcons = {
+    'Kilogramos': Icons.fitness_center,
+    'Gramos': Icons.scale,
+    'Miligramos': Icons.bubble_chart,
+    'Libras': Icons.monitor_weight,
+    'Onzas': Icons.restaurant,
+    'Toneladas': Icons.local_shipping,
+  };
+
   void _convert() {
     double? input = double.tryParse(_controller.text);
 
@@ -42,68 +57,113 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Conversor de Peso")),
+      backgroundColor: pastelBackground,
+      appBar: AppBar(
+        title: const Text(
+          "Conversor de Peso",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        elevation: 2,
+        backgroundColor: pastelPrimary,
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Caja de texto
             TextField(
               controller: _controller,
               keyboardType: TextInputType.number,
+              style: const TextStyle(fontSize: 18),
               decoration: InputDecoration(
                 labelText: 'Ingrese un valor',
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(color: pastelPrimary),
+                prefixIcon: Icon(Icons.fitness_center, color: pastelPrimary),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
               onChanged: (value) => _convert(),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 20),
+
+            // Dropdowns alineados
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                DropdownButton<String>(
-                  value: _fromUnit,
-                  items: WeightUnits.conversionRates.keys
-                      .map((unit) => DropdownMenuItem(
-                            value: unit,
-                            child: Text(unit),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() => _fromUnit = value!);
-                    _convert();
-                  },
-                ),
-                Icon(Icons.swap_horiz),
-                DropdownButton<String>(
-                  value: _toUnit,
-                  items: WeightUnits.conversionRates.keys
-                      .map((unit) => DropdownMenuItem(
-                            value: unit,
-                            child: Text(unit),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() => _toUnit = value!);
-                    _convert();
-                  },
-                ),
+                _buildDropdown(_fromUnit, (value) {
+                  setState(() => _fromUnit = value!);
+                  _convert();
+                }),
+                Icon(Icons.swap_horiz, color: pastelAccent, size: 28),
+                _buildDropdown(_toUnit, (value) {
+                  setState(() => _toUnit = value!);
+                  _convert();
+                }),
               ],
             ),
-            SizedBox(height: 32),
-            if (_error != null)
-              Text(
-                _error!,
-                style: TextStyle(color: Colors.red, fontSize: 16),
-              )
-            else if (_result != null)
-              Text(
-                'Resultado: ${_result!.toStringAsFixed(2)} $_toUnit',
-                style: TextStyle(fontSize: 20),
-              )
-            else
-              Text('Ingrese un valor para convertir'),
+            const SizedBox(height: 40),
+
+            // Resultado o error en un Card blanco
+            Card(
+              color: Colors.white,
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Text(
+                  _error != null
+                      ? _error!
+                      : _result != null
+                          ? 'Resultado:\n${_result!.toStringAsFixed(2)} $_toUnit'
+                          : 'Ingrese un valor para convertir',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: _error != null ? Colors.red : pastelPrimary,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  // Método para dropdown con íconos
+  Widget _buildDropdown(String currentValue, ValueChanged<String?> onChanged) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: pastelPrimary, width: 1.5),
+      ),
+      child: DropdownButton<String>(
+        value: currentValue,
+        underline: const SizedBox(),
+        icon: Icon(Icons.arrow_drop_down, color: pastelPrimary),
+        items: WeightUnits.conversionRates.keys.map((unit) {
+          return DropdownMenuItem(
+            value: unit,
+            child: Row(
+              children: [
+                Icon(unitIcons[unit] ?? Icons.help_outline,
+                    color: pastelPrimary, size: 20),
+                const SizedBox(width: 8),
+                Text(unit),
+              ],
+            ),
+          );
+        }).toList(),
+        onChanged: onChanged,
       ),
     );
   }
