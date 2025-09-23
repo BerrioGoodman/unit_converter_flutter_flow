@@ -3,9 +3,9 @@ class WeightUnits
   static const Map<String, double> conversionRates =
   {
     'Kilogramos' : 1.0,
-    'Gramos': 1000,
-    'Libras': 2.20462,
-    'Onzas': 35.274,
-    'Miligramos': 1000000
+    'Gramos': 0.001,
+    'Libras': 0.453592,
+    'Onzas': 0.0283495,
+    'Miligramos': 0.000001
   };
 }
