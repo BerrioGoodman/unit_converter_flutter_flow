@@ -1,3 +1,4 @@
+// Módulo que define las unidades de peso disponibles para la conversión
 class WeightUnits 
 {
   static const Map<String, double> conversionRates =

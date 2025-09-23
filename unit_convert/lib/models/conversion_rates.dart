@@ -1,3 +1,4 @@
+// Mapa de tasas de conversión para diferentes unidades de longitud
 final Map<String, double> conversionRates = {
   'Kilómetros': 1000.0,
   'Metros': 1.0,

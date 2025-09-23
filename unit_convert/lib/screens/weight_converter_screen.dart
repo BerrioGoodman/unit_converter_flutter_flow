@@ -10,18 +10,18 @@ class WeightConverterScreen extends StatefulWidget {
 }
 
 class _WeightConverterScreenState extends State<WeightConverterScreen> {
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController(); //controla lo que escribe el usuario
   String _fromUnit = 'Kilogramos';
   String _toUnit = 'Libras';
   double? _result;
   String? _error;
 
-  // 🎨 Colores pastel
+  // colores de la pantalla
   final Color pastelBackground = const Color(0xFFF8F1F1); 
   final Color pastelPrimary = const Color(0xFFA3C9A8); 
   final Color pastelAccent = const Color(0xFFEDB5BD); 
 
-  // 📌 Íconos por unidad de peso
+  // iconos por unidad
   final Map<String, IconData> unitIcons = {
     'Kilogramos': Icons.fitness_center,
     'Gramos': Icons.scale,
@@ -42,6 +42,7 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
       return;
     }
 
+    // Realiza la conversión usando el servicio
     double? converted = ConversionService.convert(
         input, _fromUnit, _toUnit, WeightUnits.conversionRates);
 
@@ -53,7 +54,7 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
         _result = converted;
         _error = null;
 
-        // Save to history
+        // guardar en historial si la conversión fue exitosa
         final conversion = ConversionHistory(
           type: 'weight',
           inputValue: input,
@@ -150,7 +151,7 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
     );
   }
 
-  // Método para dropdown con íconos
+  // Genera un Dropdown estilizado para seleccionar unidades con íconos sin repetir ningún código
   Widget _buildDropdown(String currentValue, ValueChanged<String?> onChanged) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),

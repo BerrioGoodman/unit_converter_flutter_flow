@@ -2,25 +2,28 @@ import 'package:flutter/material.dart';
 import '../models/conversion_history.dart';
 import '../services/preferences_service.dart';
 
+//como se actualiza constantemente, hereda de StatefulWidget (carga conversiones guardadas, elimina historial)
 class HistoryScreen extends StatefulWidget {
   @override
   _HistoryScreenState createState() => _HistoryScreenState();
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  List<ConversionHistory> _history = [];
+  List<ConversionHistory> _history = []; //lista de conversiones guardadas
 
-  // 🎨 Colores pastel
+  // Colores de la pantalla
   final Color pastelBackground = const Color(0xFFF8F1F1);
   final Color pastelPrimary = const Color(0xFFA3C9A8);
   final Color pastelAccent = const Color(0xFFFFE4B5);
 
+  //cargar historial al iniciar la pantalla desde preferencias
   @override
   void initState() {
     super.initState();
     _loadHistory();
   }
 
+  //Trae el historial guardado y actualiza la pantalla
   Future<void> _loadHistory() async {
     final history = await PreferencesService.getConversionHistory();
     setState(() {
@@ -28,6 +31,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
   }
 
+  // Limpia el historial guardado y actualiza la pantalla
   Future<void> _clearHistory() async {
     await PreferencesService.clearHistory();
     setState(() {
@@ -35,6 +39,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
   }
 
+  // Devuelve un nombre legible para el tipo de conversión
   String _getTypeDisplayName(String type) {
     switch (type) {
       case 'length':
@@ -47,7 +52,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
         return type;
     }
   }
-
+   
+  // Devuelve un icono apropiado para el tipo de conversión
   IconData _getTypeIcon(String type) {
     switch (type) {
       case 'length':
@@ -190,6 +196,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
+  // Formatea la marca de tiempo en un formato legible
   String _formatTimestamp(DateTime timestamp) {
     final now = DateTime.now();
     final difference = now.difference(timestamp);

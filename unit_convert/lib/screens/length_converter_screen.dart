@@ -10,17 +10,17 @@ class LengthConverterScreen extends StatefulWidget {
 }
 
 class _LengthConverterScreenState extends State<LengthConverterScreen> {
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController(); //controla lo que escribe el usuario
   String _fromUnit = 'Kilómetros';
   String _toUnit = "Metros";
   double? _result;
 
-  // 🎨 Colores pastel
+//colores de la pantalla
   final Color pastelBackground = const Color(0xFFF8F1F1); 
   final Color pastelPrimary = const Color(0xFFA3C9A8); 
   final Color pastelAccent = const Color(0xFF84B1ED); 
 
-  // 📌 Íconos por unidad
+  // Íconos por unidad
   final Map<String, IconData> unitIcons = {
     'Kilómetros': Icons.map,
     'Metros': Icons.straighten,
@@ -33,6 +33,7 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
   };
 
   void _convert() {
+    //Convierte usando la función ubicada en el servicio
     double? input = double.tryParse(_controller.text);
     if (input != null) {
       final result =
@@ -41,7 +42,7 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
         _result = result;
       });
 
-      // Save to history if conversion was successful
+      // Guardar en historial si la conversión fue exitosa
       if (result != null) {
         final conversion = ConversionHistory(
           type: 'length',
@@ -74,7 +75,7 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
         backgroundColor: pastelPrimary,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -141,7 +142,7 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
     );
   }
 
-  // Método para dropdown con íconos
+  // Genera un Dropdown estilizado para seleccionar unidades con íconos
   Widget _buildDropdown(String currentValue, ValueChanged<String?> onChanged) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),

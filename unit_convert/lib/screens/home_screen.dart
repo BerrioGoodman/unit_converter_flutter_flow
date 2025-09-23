@@ -4,14 +4,16 @@ import 'weight_converter_screen.dart';
 import 'temperature_converter_screen.dart';
 import 'history_screen.dart';
 
+//Es stateful porque cambia constantemente la pantalla al seleccionar una pestaña
 class HomeScreen extends StatefulWidget {
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
+  int _selectedIndex = 0; //pestaña seleccionada actualmente
 
+  // Lista de pantallas para cada pestaña
   final List<Widget> _screens = [
     LengthConverterScreen(),
     WeightConverterScreen(),
@@ -19,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
     HistoryScreen(),
   ];
 
+  // Cambia la pestaña seleccionada cuando el usuario toca un ícono
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;

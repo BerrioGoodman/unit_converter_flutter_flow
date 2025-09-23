@@ -3,10 +3,10 @@ class ConversionService {
   static double? convert(double value, String fromUnit, String toUnit, Map<String, double> rates)
   {
     if(value < 0) return null; // Manejo de valores negativos
-    if(!rates.containsKey(fromUnit) || !rates.containsKey(toUnit)) return null; // Manejo de unidades no válidas
+    if(!rates.containsKey(fromUnit) || !rates.containsKey(toUnit)) return null; // si no existe la unidad en la lista
 
-    double baseValue = value * rates[fromUnit]!;
-    return baseValue / rates[toUnit]!;
+    double baseValue = value * rates[fromUnit]!; // Convertir a la unidad base (kg, m, etc.)
+    return baseValue / rates[toUnit]!; // Convertir a la unidad deseada
   }
 
   //temp conversion

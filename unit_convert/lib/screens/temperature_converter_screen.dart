@@ -10,17 +10,17 @@ class TemperatureConverterScreen extends StatefulWidget {
 }
 
 class _TemperatureConverterScreenState extends State<TemperatureConverterScreen> {
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController(); //controla lo que escribe el usuario
   String _fromUnit = 'Celsius';
   String _toUnit = 'Fahrenheit';
   double? _result;
 
-  // 🎨 Colores pastel
+  // colores de la aplicación
   final Color pastelBackground = const Color(0xFFF8F1F1);
   final Color pastelPrimary = const Color(0xFFA3C9A8);
   final Color pastelAccent = const Color(0xFFFFDAB9);
 
-  // 📌 Íconos por unidad de temperatura
+  // Íconos por unidad
   final Map<String, IconData> unitIcons = {
     'Celsius': Icons.thermostat,
     'Fahrenheit': Icons.local_fire_department,
@@ -30,12 +30,12 @@ class _TemperatureConverterScreenState extends State<TemperatureConverterScreen>
   void _convert() {
     double? input = double.tryParse(_controller.text);
     if (input != null) {
-      final result = ConversionService.convertTemperature(input, _fromUnit, _toUnit);
+      final result = ConversionService.convertTemperature(input, _fromUnit, _toUnit);//función específica para temperatura
       setState(() {
         _result = result;
       });
 
-      // Save to history if conversion was successful
+      // Guardar en historial si la conversión fue exitosa
       if (result != null) {
         final conversion = ConversionHistory(
           type: 'temperature',
@@ -135,7 +135,7 @@ class _TemperatureConverterScreenState extends State<TemperatureConverterScreen>
     );
   }
 
-  // Método para dropdown con íconos
+  // Genera un Dropdown estilizado para seleccionar unidades con íconos sin repetir ningún código
   Widget _buildDropdown(String currentValue, ValueChanged<String?> onChanged) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),

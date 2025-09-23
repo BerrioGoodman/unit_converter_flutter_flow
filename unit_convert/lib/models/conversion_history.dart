@@ -1,11 +1,12 @@
 class ConversionHistory {
-  final String type; // 'length', 'weight', 'temperature'
-  final double inputValue;
-  final String fromUnit;
-  final String toUnit;
-  final double result;
-  final DateTime timestamp;
+  final String type; //Tipo de conversión: longitud, peso, temperatura
+  final double inputValue; //Valor de entrada
+  final String fromUnit; //Unidad inicial
+  final String toUnit; //Unidad final
+  final double result; //valor convertido
+  final DateTime timestamp; //cuando se realizó la conversión
 
+  // Constructor para inicializar los campos
   ConversionHistory({
     required this.type,
     required this.inputValue,
@@ -15,7 +16,7 @@ class ConversionHistory {
     required this.timestamp,
   });
 
-  // Convert to JSON for storage
+  //Guardar como JSON y eso es útil para almacenamiento
   Map<String, dynamic> toJson() {
     return {
       'type': type,
@@ -27,7 +28,7 @@ class ConversionHistory {
     };
   }
 
-  // Create from JSON
+  // Permite volver a crear un objeto desde JSON - para poder poner esto en el historial de la app
   factory ConversionHistory.fromJson(Map<String, dynamic> json) {
     return ConversionHistory(
       type: json['type'],
@@ -39,6 +40,7 @@ class ConversionHistory {
     );
   }
 
+  //Muesta el historial de conversiones en un formato legible
   @override
   String toString() {
     return '$inputValue $fromUnit → $result $toUnit (${timestamp.toString().split('.')[0]})';
