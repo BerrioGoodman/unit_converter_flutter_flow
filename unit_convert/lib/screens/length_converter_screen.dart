@@ -14,6 +14,7 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
   String _fromUnit = 'Kilómetros';
   String _toUnit = "Metros";
   double? _result;
+  String? _error;
 
 //colores de la pantalla
   final Color pastelBackground = const Color(0xFFF8F1F1); 
@@ -35,15 +36,27 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
   void _convert() {
     //Convierte usando la función ubicada en el servicio
     double? input = double.tryParse(_controller.text);
-    if (input != null) {
-      final result =
-          ConversionService.convert(input, _fromUnit, _toUnit, conversionRates);
-      setState(() {
-        _result = result;
-      });
 
-      // Guardar en historial si la conversión fue exitosa
-      if (result != null) {
+    if (input == null) {
+      setState(() {
+        _result = null;
+        _error = "Ingrese un número válido";
+      });
+      return;
+    }
+
+    final result =
+        ConversionService.convert(input, _fromUnit, _toUnit, conversionRates);
+
+    setState(() {
+      if (result == null) {
+        _result = null;
+        _error = "Error en la conversión";
+      } else {
+        _result = result;
+        _error = null;
+
+        // Guardar en historial si la conversión fue exitosa
         final conversion = ConversionHistory(
           type: 'length',
           inputValue: input,
@@ -54,11 +67,7 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
         );
         PreferencesService.saveConversion(conversion);
       }
-    } else {
-      setState(() {
-        _result = null;
-      });
-    }
+    });
   }
 
   @override
@@ -94,7 +103,6 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              onChanged: (value) => _convert(),
             ),
             const SizedBox(height: 20),
 
@@ -104,16 +112,33 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
               children: [
                 _buildDropdown(_fromUnit, (value) {
                   setState(() => _fromUnit = value!);
-                  _convert();
                 }),
                 Icon(Icons.swap_horiz, color: pastelAccent, size: 28),
                 _buildDropdown(_toUnit, (value) {
                   setState(() => _toUnit = value!);
-                  _convert();
                 }),
               ],
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
+
+            // Botón de conversión
+            ElevatedButton(
+              onPressed: _convert,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: pastelPrimary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 4,
+              ),
+              child: const Text(
+                'Hacer Conversión',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 20),
 
             // Resultado estilizado con fondo blanco y sombra
             Card(
@@ -124,14 +149,16 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Text(
-                  _result == null
-                      ? 'Ingrese un número válido'
-                      : 'Resultado:\n${_result!.toStringAsFixed(2)} $_toUnit',
+                  _error != null
+                      ? _error!
+                      : _result != null
+                          ? 'Resultado:\n${_result!.toStringAsFixed(2)} $_toUnit'
+                          : 'Presione "Hacer conversión" para convertir',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 22,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: pastelPrimary,
+                    color: _error != null ? Colors.red : pastelPrimary,
                   ),
                 ),
               ),

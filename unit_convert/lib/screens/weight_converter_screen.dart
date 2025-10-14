@@ -49,7 +49,7 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
     setState(() {
       if (converted == null) {
         _result = null;
-        _error = "El valor no puede ser negativo";
+        _error = "Error en la conversión";
       } else {
         _result = converted;
         _error = null;
@@ -101,7 +101,6 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              onChanged: (value) => _convert(),
             ),
             const SizedBox(height: 20),
 
@@ -111,16 +110,33 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
               children: [
                 _buildDropdown(_fromUnit, (value) {
                   setState(() => _fromUnit = value!);
-                  _convert();
                 }),
                 Icon(Icons.swap_horiz, color: pastelAccent, size: 28),
                 _buildDropdown(_toUnit, (value) {
                   setState(() => _toUnit = value!);
-                  _convert();
                 }),
               ],
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
+
+            // Botón de conversión
+            ElevatedButton(
+              onPressed: _convert,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: pastelPrimary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 4,
+              ),
+              child: const Text(
+                'Hacer conversión',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 20),
 
             // Resultado o error en un Card blanco
             Card(
@@ -135,12 +151,12 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
                       ? _error!
                       : _result != null
                           ? 'Resultado:\n${_result!.toStringAsFixed(2)} $_toUnit'
-                          : 'Ingrese un valor para convertir',
+                          : 'Presione "Hacer conversión" para convertir',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: _error != null ? Colors.black : pastelPrimary,
+                    color: _error != null ? Colors.red : pastelPrimary,
                   ),
                 ),
               ),
