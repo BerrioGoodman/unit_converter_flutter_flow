@@ -1,66 +1,123 @@
 import 'package:flutter/material.dart';
-import '../models/weight_units.dart';
-import '../services/conversion_service.dart';
+import '../models/currency_units.dart';
+import '../services/currency_service.dart';
+import '../models/exchange_rates.dart';
 import '../models/conversion_history.dart';
 import '../services/preferences_service.dart';
 
-class WeightConverterScreen extends StatefulWidget {
+class CurrencyConverterScreen extends StatefulWidget {
   @override
-  _WeightConverterScreenState createState() => _WeightConverterScreenState();
+  _CurrencyConverterScreenState createState() => _CurrencyConverterScreenState();
 }
 
-class _WeightConverterScreenState extends State<WeightConverterScreen> {
-  final TextEditingController _controller = TextEditingController(); //controla lo que escribe el usuario
-  String _fromUnit = 'Kilogramos';
-  String _toUnit = 'Libras';
+class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
+  final TextEditingController _controller = TextEditingController();
+  String _fromUnit = 'USD';
+  String _toUnit = 'EUR';
   double? _result;
   String? _error;
+  bool _isLoading = false;
+  ExchangeRates? _exchangeRates;
 
   // colores de la pantalla
-  final Color pastelBackground = const Color(0xFFF8F1F1); 
-  final Color pastelPrimary = const Color(0xFFA3C9A8); 
-  final Color pastelAccent = const Color(0xFFEDB5BD); 
+  final Color pastelBackground = const Color(0xFFF8F1F1);
+  final Color pastelPrimary = const Color(0xFFA3C9A8);
+  final Color pastelAccent = const Color(0xFFFFDAB9);
 
-  // iconos por unidad
-  final Map<String, IconData> unitIcons = {
-    'Kilogramos': Icons.fitness_center,
-    'Gramos': Icons.scale,
-    'Miligramos': Icons.bubble_chart,
-    'Libras': Icons.monitor_weight,
-    'Onzas': Icons.restaurant,
-    'Toneladas': Icons.local_shipping,
+  // Íconos por unidad
+  final Map<String, IconData> currencyIcons = {
+    'USD': Icons.attach_money,
+    'EUR': Icons.euro,
+    'GBP': Icons.currency_pound,
+    'JPY': Icons.currency_yen,
+    'CAD': Icons.currency_exchange,
+    'AUD': Icons.currency_exchange,
+    'CHF': Icons.currency_franc,
+    'CNY': Icons.currency_yen,
+    'COP': Icons.currency_exchange,
+    'MXN': Icons.currency_exchange,
+    'BRL': Icons.currency_exchange,
+    'ARS': Icons.currency_exchange,
+    'CLP': Icons.currency_exchange,
+    'PEN': Icons.currency_exchange,
+    'UYU': Icons.currency_exchange,
   };
 
-  void _convert() {
+  @override
+  void initState() {
+    super.initState();
+    _loadExchangeRates();
+  }
+
+Future<void> _loadExchangeRates() async {
+  setState(() {
+    _isLoading = true;
+    _error = null;
+  });
+
+  try {
+    final rates = await CurrencyService.getCachedOrFetchRates();
+
+    if (rates != null) {
+      // Esto imprimirá el mapa de monedas y sus tasas en la consola
+      print('Tasas de cambio recibidas de la API: ${rates.rates}');
+    } else {
+      print('No se recibieron tasas de la API.');
+    }
+
+    setState(() {
+      _exchangeRates = rates;
+      _isLoading = false;
+      if (rates == null) {
+        _error = 'Error al cargar las tasas de cambio';
+      }
+    });
+  } catch (e) {
+    setState(() {
+      _isLoading = false;
+      _error = 'Error de conexión: $e';
+    });
+  }
+}
+
+  void _convert() async {
+    if (_exchangeRates == null) {
+      await _loadExchangeRates();
+      if (_exchangeRates == null) {
+        setState(() {
+          _error = 'No se pudieron cargar las tasas de cambio';
+        });
+        return;
+      }
+    }
+
     double? input = double.tryParse(_controller.text);
 
-    if (input == null) {
+    if (input == null || input <= 0) {
       setState(() {
         _result = null;
-        _error = "Ingrese un número válido";
+        _error = "Ingrese un valor válido mayor a 0";
       });
       return;
     }
 
-    // Realiza la conversión usando el servicio
-    double? converted = ConversionService.convert(
-        input, _fromUnit, _toUnit, WeightUnits.conversionRates);
+    final result = CurrencyService.convertCurrency(input, _fromUnit, _toUnit, _exchangeRates!);
 
     setState(() {
-      if (converted == null) {
+      if (result == null) {
         _result = null;
         _error = "Error en la conversión";
       } else {
-        _result = converted;
+        _result = result;
         _error = null;
 
-        // guardar en historial si la conversión fue exitosa
+        // Guardar en historial si la conversión fue exitosa
         final conversion = ConversionHistory(
-          type: 'weight',
+          type: 'currency',
           inputValue: input,
           fromUnit: _fromUnit,
           toUnit: _toUnit,
-          result: converted,
+          result: result,
           timestamp: DateTime.now(),
         );
         PreferencesService.saveConversion(conversion);
@@ -74,18 +131,45 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
       backgroundColor: pastelBackground,
       appBar: AppBar(
         title: const Text(
-          "Conversor de Peso",
+          'Conversor de Moneda',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         elevation: 2,
         backgroundColor: pastelPrimary,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadExchangeRates,
+            tooltip: 'Actualizar tasas',
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Indicador de carga o error de API
+            if (_isLoading)
+              const Center(
+                child: CircularProgressIndicator(),
+              )
+            else if (_error != null && _exchangeRates == null)
+              Card(
+                color: Colors.red.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    _error!,
+                    style: const TextStyle(color: Colors.red),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              )
+            else
+              Container(),
+
             // Caja de texto
             TextField(
               controller: _controller,
@@ -94,7 +178,7 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
               decoration: InputDecoration(
                 labelText: 'Ingrese un valor',
                 labelStyle: TextStyle(color: pastelPrimary),
-                prefixIcon: Icon(Icons.fitness_center, color: pastelPrimary),
+                prefixIcon: Icon(Icons.attach_money, color: pastelPrimary),
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
@@ -138,7 +222,7 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Resultado o error en un Card blanco
+            // Resultado estilizado con fondo blanco y sombra
             Card(
               color: Colors.white,
               elevation: 4,
@@ -161,13 +245,27 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
                 ),
               ),
             ),
+
+            // Información de última actualización
+            if (_exchangeRates != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: Text(
+                  'Última actualización: ${_exchangeRates!.timestamp.toString().substring(0, 19)}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
           ],
         ),
       ),
     );
   }
 
-  // Genera un Dropdown estilizado para seleccionar unidades con íconos sin repetir ningún código
+  // Genera un Dropdown estilizado para seleccionar monedas con íconos
   Widget _buildDropdown(String currentValue, ValueChanged<String?> onChanged) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -180,15 +278,15 @@ class _WeightConverterScreenState extends State<WeightConverterScreen> {
         value: currentValue,
         underline: const SizedBox(),
         icon: Icon(Icons.arrow_drop_down, color: pastelPrimary),
-        items: WeightUnits.conversionRates.keys.map((unit) {
+        items: CurrencyUnits.currencies.map((currency) {
           return DropdownMenuItem(
-            value: unit,
+            value: currency,
             child: Row(
               children: [
-                Icon(unitIcons[unit] ?? Icons.help_outline,
+                Icon(currencyIcons[currency] ?? Icons.attach_money,
                     color: pastelPrimary, size: 20),
                 const SizedBox(width: 8),
-                Text(unit),
+                Text('${CurrencyUnits.currencySymbols[currency] ?? currency} ($currency)'),
               ],
             ),
           );

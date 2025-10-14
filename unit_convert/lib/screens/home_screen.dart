@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'length_converter_screen.dart';
 import 'weight_converter_screen.dart';
 import 'temperature_converter_screen.dart';
+import 'currency_converter_screen.dart';
 import 'history_screen.dart';
 
 //Es stateful porque cambia constantemente la pantalla al seleccionar una pestaña
@@ -18,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
     LengthConverterScreen(),
     WeightConverterScreen(),
     TemperatureConverterScreen(),
+    CurrencyConverterScreen(),
     HistoryScreen(),
   ];
 
@@ -45,6 +47,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.thermostat),
             label: 'Temperatura',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.attach_money),
+            label: 'Moneda',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history),
