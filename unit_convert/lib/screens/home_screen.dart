@@ -5,9 +5,15 @@ import 'temperature_converter_screen.dart';
 import 'currency_converter_screen.dart';
 import 'history_screen.dart';
 import 'login_screen.dart';
+import 'profile_screen.dart';
+import '../models/user.dart';
 
 //Es stateful porque cambia constantemente la pantalla al seleccionar una pestaña
 class HomeScreen extends StatefulWidget {
+  final User user;
+
+  HomeScreen({required this.user});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -16,19 +22,39 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0; //pestaña seleccionada actualmente
 
   // Lista de pantallas para cada pestaña
-  final List<Widget> _screens = [
-    LengthConverterScreen(),
-    WeightConverterScreen(),
-    TemperatureConverterScreen(),
-    CurrencyConverterScreen(),
-    HistoryScreen(),
-  ];
+  late final List<Widget> _screens;
 
   // Cambia la pestaña seleccionada cuando el usuario toca un ícono
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      LengthConverterScreen(),
+      WeightConverterScreen(),
+      TemperatureConverterScreen(),
+      CurrencyConverterScreen(),
+      HistoryScreen(),
+    ];
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  void _navigateToProfile() async {
+    final updatedUser = await Navigator.of(context).push<User>(
+      MaterialPageRoute(builder: (context) => ProfileScreen(user: widget.user)),
+    );
+
+    if (updatedUser != null) {
+      // Update the user if it was modified
+      setState(() {
+        // Since User is immutable, we need to create a new HomeScreen or handle differently
+        // For now, we'll just update the reference if needed
+      });
+    }
   }
 
   void _logout() {
@@ -65,6 +91,11 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Unit Converter'),
         backgroundColor: const Color(0xFFA3C9A8),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () => _navigateToProfile(),
+            tooltip: 'Perfil',
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: _logout,

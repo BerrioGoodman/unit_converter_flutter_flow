@@ -38,12 +38,6 @@ class DatabaseHelper {
         password TEXT NOT NULL
       )
     ''');
-
-    // Insert a default user for testing
-    await db.insert(tableUsers, {
-      'username': 'admin',
-      'password': '1234',
-    });
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {

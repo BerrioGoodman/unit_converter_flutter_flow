@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/database_helper.dart';
-import '../models/user.dart';
 import 'home_screen.dart';
 import 'register_screen.dart';
 
@@ -24,9 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    // Pre-fill with default credentials for testing
-    _usernameController.text = 'admin';
-    _passwordController.text = '1234';
   }
 
   Future<void> _login() async {
@@ -46,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (user != null) {
         // Login successful, navigate to home screen
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => HomeScreen(user: user)),
         );
       } else {
         setState(() {

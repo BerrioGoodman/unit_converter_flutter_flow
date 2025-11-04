@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../services/conversion_service.dart';
+import '../services/conversion_service.dart';
 import '../models/conversion_rates.dart';
 import '../models/conversion_history.dart';
 import '../services/preferences_service.dart';
