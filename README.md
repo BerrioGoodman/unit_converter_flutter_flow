@@ -198,15 +198,50 @@ La aplicación utiliza la **Free Currency API** para obtener tasas de cambio en 
 
 ## SQLite Database
 
-La aplicación utiliza **SQLite** para el almacenamiento local de usuarios.
+La aplicación utiliza **SQLite** para el almacenamiento local de usuarios y su historial de conversiones.
 
 ### Tabla: users
 
-| Campo     | Tipo    | Descripción              |
-|-----------|---------|--------------------------|
-| id        | INTEGER | Primary Key Autoincrement|
-| username  | TEXT    | Nombre de usuario único  |
-| password  | TEXT    | Contraseña del usuario   |
+| Campo      | Tipo    | Descripción                    |
+|------------|---------|--------------------------------|
+| id         | INTEGER | Primary Key Autoincrement      |
+| username   | TEXT    | Nombre de usuario único        |
+| password   | TEXT    | Contraseña del usuario         |
+### Tabla: conversions
+
+| Campo       | Tipo    | Descripción                          |
+|-------------|---------|--------------------------------------|
+| id          | INTEGER | Primary Key Autoincrement            |
+| user_id     | INTEGER | Foreign Key → users.id (CASCADE)     |
+| type        | TEXT    | Tipo: 'length', 'weight', 'temp', 'currency' |
+| input_value | REAL    | Valor de entrada                     |
+| from_unit   | TEXT    | Unidad de origen                     |
+| to_unit     | TEXT    | Unidad de destino                    |
+| result      | REAL    | Resultado de la conversión           |
+| timestamp   | TEXT    | Fecha y hora de la conversión        |
+
+### Relaciones:
+
+- **users** ↔ **conversions**: Un usuario puede tener múltiples conversiones (1:N)
+- **Foreign Key Constraint**: Al eliminar un usuario, se eliminan automáticamente todas sus conversiones (CASCADE)
+
+### Operaciones soportadas:
+
+**Usuarios:**
+- Insertar usuario (registro).
+- Obtener usuario por credenciales (login).
+- Verificar si username está disponible.
+- Listar todos los usuarios.
+- Actualizar usuario.
+- Eliminar usuario.
+
+**Conversiones:**
+- Insertar conversión por usuario.
+- Obtener historial de conversiones por usuario.
+- Eliminar historial de conversiones por usuario.
+- Obtener estadísticas de conversiones por usuario (conteo por tipo).
+| email      | TEXT    | Correo electrónico (opcional)  |
+| created_at | TEXT    | Fecha de creación del usuario  |
 
 ### Operaciones soportadas:
 
