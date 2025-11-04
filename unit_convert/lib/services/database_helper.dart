@@ -37,9 +37,7 @@ class DatabaseHelper {
       CREATE TABLE $tableUsers (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL,
-        email TEXT,
-        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        password TEXT NOT NULL
       )
     ''');
 
@@ -60,10 +58,6 @@ class DatabaseHelper {
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      // Add email and created_at columns to users table
-      await db.execute('ALTER TABLE $tableUsers ADD COLUMN email TEXT');
-      await db.execute('ALTER TABLE $tableUsers ADD COLUMN created_at TEXT DEFAULT CURRENT_TIMESTAMP');
-
       // Create conversions table
       await db.execute('''
         CREATE TABLE $tableConversions (
@@ -191,6 +185,45 @@ class DatabaseHelper {
       GROUP BY type
       ORDER BY count DESC
     ''', [userId]);
+  }
+
+  Future<List<Map<String, dynamic>>> getAllConversionsWithUsers() async {
+    Database db = await database;
+    return await db.rawQuery('''
+      SELECT
+        c.id as conversion_id,
+        c.user_id,
+        c.type,
+        c.input_value,
+        c.from_unit,
+        c.to_unit,
+        c.result,
+        c.timestamp,
+        u.username
+      FROM $tableConversions c
+      INNER JOIN $tableUsers u ON c.user_id = u.id
+      ORDER BY c.timestamp DESC
+    ''');
+  }
+
+  Future<Map<String, dynamic>> getConversionStatsByUser() async {
+    Database db = await database;
+    final results = await db.rawQuery('''
+      SELECT
+        u.username,
+        COUNT(c.id) as total_conversions,
+        GROUP_CONCAT(DISTINCT c.type) as conversion_types
+      FROM $tableUsers u
+      LEFT JOIN $tableConversions c ON u.id = c.user_id
+      GROUP BY u.id, u.username
+      ORDER BY total_conversions DESC
+    ''');
+
+    return {
+      'userStats': results,
+      'totalUsers': results.length,
+      'totalConversions': results.fold<int>(0, (sum, user) => sum + (user['total_conversions'] as int)),
+    };
   }
 
   Future<void> close() async {

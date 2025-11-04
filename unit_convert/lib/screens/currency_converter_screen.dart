@@ -4,8 +4,14 @@ import '../services/currency_service.dart';
 import '../models/exchange_rates.dart';
 import '../models/conversion_history.dart';
 import '../services/preferences_service.dart';
+import '../services/database_helper.dart';
+import '../models/user.dart';
 
 class CurrencyConverterScreen extends StatefulWidget {
+  final User? user; // Usuario actual para guardar conversiones en BD
+
+  const CurrencyConverterScreen({Key? key, this.user}) : super(key: key);
+
   @override
   _CurrencyConverterScreenState createState() => _CurrencyConverterScreenState();
 }
@@ -80,7 +86,7 @@ Future<void> _loadExchangeRates() async {
   }
 }
 
-  void _convert() async {
+  Future<void> _convert() async {
     if (_exchangeRates == null) {
       await _loadExchangeRates();
       if (_exchangeRates == null) {
@@ -120,7 +126,18 @@ Future<void> _loadExchangeRates() async {
           result: result,
           timestamp: DateTime.now(),
         );
+
+        // Guardar en SharedPreferences (historial general)
         PreferencesService.saveConversion(conversion);
+
+        // Si hay usuario logueado, guardar también en base de datos
+        if (widget.user != null && widget.user!.id != null) {
+          try {
+            await DatabaseHelper.instance.insertConversion(widget.user!.id!, conversion);
+          } catch (e) {
+            print('Error al guardar conversión en BD: $e');
+          }
+        }
       }
     });
   }

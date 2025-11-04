@@ -6,6 +6,7 @@ import 'currency_converter_screen.dart';
 import 'history_screen.dart';
 import 'login_screen.dart';
 import 'profile_screen.dart';
+import 'admin_screen.dart';
 import '../models/user.dart';
 
 //Es stateful porque cambia constantemente la pantalla al seleccionar una pestaña
@@ -29,10 +30,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _screens = [
-      LengthConverterScreen(),
+      LengthConverterScreen(user: widget.user),
       WeightConverterScreen(),
       TemperatureConverterScreen(),
-      CurrencyConverterScreen(),
+      CurrencyConverterScreen(user: widget.user),
       HistoryScreen(),
     ];
   }
@@ -55,6 +56,12 @@ class _HomeScreenState extends State<HomeScreen> {
         // For now, we'll just update the reference if needed
       });
     }
+  }
+
+  void _navigateToAdmin() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => AdminScreen()),
+    );
   }
 
   void _logout() {
@@ -91,6 +98,11 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Unit Converter'),
         backgroundColor: const Color(0xFFA3C9A8),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.admin_panel_settings),
+            onPressed: () => _navigateToAdmin(),
+            tooltip: 'Panel Admin',
+          ),
           IconButton(
             icon: const Icon(Icons.person),
             onPressed: () => _navigateToProfile(),

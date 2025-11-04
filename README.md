@@ -79,6 +79,8 @@ lib/
 
 ├── profile\_screen.dart                   # Pantalla de perfil de usuario
 
+├── admin\_screen.dart                     # Panel administrativo para ver todas las conversiones
+
 ├── length\_converter\_screen.dart         # Conversor de longitud
 
 ├── weight\_converter\_screen.dart         # Conversor de peso
@@ -207,6 +209,7 @@ La aplicación utiliza **SQLite** para el almacenamiento local de usuarios y su 
 | id         | INTEGER | Primary Key Autoincrement      |
 | username   | TEXT    | Nombre de usuario único        |
 | password   | TEXT    | Contraseña del usuario         |
+
 ### Tabla: conversions
 
 | Campo       | Tipo    | Descripción                          |
@@ -240,8 +243,6 @@ La aplicación utiliza **SQLite** para el almacenamiento local de usuarios y su 
 - Obtener historial de conversiones por usuario.
 - Eliminar historial de conversiones por usuario.
 - Obtener estadísticas de conversiones por usuario (conteo por tipo).
-| email      | TEXT    | Correo electrónico (opcional)  |
-| created_at | TEXT    | Fecha de creación del usuario  |
 
 ### Operaciones soportadas:
 
@@ -330,6 +331,18 @@ Almacena usuario en base de datos SQLite.
 Muestra información del usuario actual.
 
 Permite cerrar sesión.
+
+## 🔹 AdminScreen
+
+Panel administrativo con pestañas para ver todas las conversiones realizadas por usuarios.
+
+**Funcionalidades:**
+
+- **Todas las Conversiones**: Lista completa de conversiones con información del usuario que las realizó.
+
+- **Estadísticas**: Métricas generales y por usuario (número de conversiones, tipos utilizados).
+
+Muestra datos en tiempo real con opción de actualizar.
 
 ## 🔹 LengthConverterScreen
 

@@ -3,8 +3,14 @@ import '../services/conversion_service.dart';
 import '../models/conversion_rates.dart';
 import '../models/conversion_history.dart';
 import '../services/preferences_service.dart';
+import '../services/database_helper.dart';
+import '../models/user.dart';
 
 class LengthConverterScreen extends StatefulWidget {
+  final User? user; // Usuario actual para guardar conversiones en BD
+
+  const LengthConverterScreen({Key? key, this.user}) : super(key: key);
+
   @override
   _LengthConverterScreenState createState() => _LengthConverterScreenState();
 }
@@ -33,7 +39,7 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
     'Millas': Icons.directions_car,
   };
 
-  void _convert() {
+  Future<void> _convert() async {
     //Convierte usando la función ubicada en el servicio
     double? input = double.tryParse(_controller.text);
 
@@ -65,7 +71,18 @@ class _LengthConverterScreenState extends State<LengthConverterScreen> {
           result: result,
           timestamp: DateTime.now(),
         );
+
+        // Guardar en SharedPreferences (historial general)
         PreferencesService.saveConversion(conversion);
+
+        // Si hay usuario logueado, guardar también en base de datos
+        if (widget.user != null && widget.user!.id != null) {
+          try {
+            await DatabaseHelper.instance.insertConversion(widget.user!.id!, conversion);
+          } catch (e) {
+            print('Error al guardar conversión en BD: $e');
+          }
+        }
       }
     });
   }
